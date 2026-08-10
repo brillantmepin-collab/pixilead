@@ -30,7 +30,7 @@ function readBearerToken(request: Request): string | null {
   return token.length > 0 ? token : null;
 }
 
-export const DEMO_USER_ID = "00000000-0000-0000-0000-000000000000";
+export const DEMO_USER_ID = "e494044a-7123-47aa-a717-85a5d676c2cf";
 
 export async function getAuthenticatedUser(
   request: Request

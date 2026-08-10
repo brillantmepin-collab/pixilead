@@ -94,7 +94,7 @@ export async function POST(request: NextRequest) {
   if (insertError || !payment) {
     console.error("[MONEROO] Insertion du paiement impossible:", insertError);
     return NextResponse.json(
-      { error: "Impossible de créer le paiement." },
+      { error: insertError?.message || "Impossible de créer le paiement en base de données." },
       { status: 500 }
     );
   }
