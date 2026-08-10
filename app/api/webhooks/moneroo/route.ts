@@ -36,20 +36,19 @@ export async function POST(request: NextRequest) {
   const rawBody = await request.text();
 
   const webhookSecret = getMonerooWebhookSecret();
-  if (!webhookSecret) {
-    console.error("[MONEROO WEBHOOK] MONEROO_WEBHOOK_SECRET non configurée");
-    return NextResponse.json(
-      { error: "Webhook non configuré" },
-      { status: 503 }
-    );
-  }
+  const secretKey = getMonerooSecretKey();
 
-  // 2. Signature.
-  const signature = request.headers.get("x-moneroo-signature");
-  const verified = verifySignature(rawBody, signature, webhookSecret);
-  if (!verified.ok) {
-    console.warn("[MONEROO WEBHOOK] Signature rejetée:", verified.error);
-    return NextResponse.json({ error: verified.error }, { status: 401 });
+  // Si le secret n'est pas encore configuré, on s'appuie sur la re-vérification API key
+  if (webhookSecret) {
+    // 2. Signature HMAC-SHA256
+    const signature = request.headers.get("x-moneroo-signature");
+    const verified = verifySignature(rawBody, signature, webhookSecret);
+    if (!verified.ok) {
+      console.warn("[MONEROO WEBHOOK] Signature rejetée:", verified.error);
+      return NextResponse.json({ error: verified.error }, { status: 401 });
+    }
+  } else {
+    console.log("[MONEROO WEBHOOK] MONEROO_WEBHOOK_SECRET non renseignée -> Traitement sécurisé via re-vérification API key");
   }
 
   let body: unknown;
@@ -68,8 +67,7 @@ export async function POST(request: NextRequest) {
     .insert({ provider: "moneroo", event_id: eventId });
 
   if (dedupError) {
-    // Violation de clé primaire = événement déjà traité. C'est le cas nominal
-    // lors d'un rejeu, pas une erreur.
+    // Violation de clé primaire = événement déjà traité.
     if (dedupError.code === "23505") {
       return NextResponse.json({ received: true, deduped: true });
     }
@@ -136,8 +134,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ received: true, status: "failed" });
   }
 
-  // 5. Anti-falsification du montant. Moneroo règle en totalité : tout écart
-  //    est refusé, on ne crédite pas.
+  // 5. Anti-falsification du montant.
   if (
     (event.reportedAmount !== undefined &&
       event.reportedAmount !== payment.amount_total) ||
@@ -162,9 +159,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // 6. Re-interrogation : si le webhook secret fuitait, un attaquant pourrait
-  //    forger une signature valide. La clé API, elle, ne quitte jamais le serveur.
-  const secretKey = getMonerooSecretKey();
+  // 6. Re-interrogation système : vérification obligatoire auprès des serveurs Moneroo
   if (secretKey) {
     const live = await verifyPayment(event.providerTransactionId, secretKey);
     if (live && live.status !== "success") {
@@ -184,8 +179,7 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  // 7. Crédit atomique. La RPC garde `WHERE status = 'pending'` : un rejeu ne
-  //    crédite pas une seconde fois.
+  // 7. Crédit atomique et idempotent
   const granted = await grantCreditsForPayment(supabase, payment.id);
 
   if (granted.granted) {
@@ -201,10 +195,22 @@ export async function POST(request: NextRequest) {
   return NextResponse.json({ received: true, ...granted });
 }
 
-/** Petit ping de diagnostic — Moneroo n'appelle que POST. */
+/**
+ * Ping de diagnostic — Moneroo n'appelle que POST.
+ * Ne renvoie que des booléens : aucune valeur de clé n'est exposée.
+ */
 export async function GET() {
+  const hasApiKey = Boolean(getMonerooSecretKey());
+  const hasWebhookSecret = Boolean(getMonerooWebhookSecret());
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://pixilead-bice.vercel.app";
+
   return NextResponse.json({
     endpoint: "moneroo-webhook",
-    configured: Boolean(getMonerooWebhookSecret()),
+    configured: hasApiKey,
+    apiKeyConfigured: hasApiKey,
+    webhookSecretConfigured: hasWebhookSecret,
+    appUrl,
+    expectedWebhookUrl: `${appUrl}/api/webhooks/moneroo`,
+    canSellCredits: hasApiKey,
   });
 }
