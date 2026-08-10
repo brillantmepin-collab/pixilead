@@ -1,4 +1,5 @@
 import { createServerClient } from "@supabase/ssr";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 
 const PLACEHOLDER_URL = "https://placeholder.supabase.co";
@@ -28,7 +29,6 @@ export async function createClient() {
 }
 
 export function createAdminClient() {
-  const { createClient: createSupabaseClient } = require("@supabase/supabase-js");
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || PLACEHOLDER_URL;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || PLACEHOLDER_KEY;
 

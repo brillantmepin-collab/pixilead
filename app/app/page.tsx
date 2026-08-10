@@ -5,15 +5,18 @@ import Link from "next/link";
 import { History, ArrowRight, CheckCircle2, AlertCircle, Clock, Users, PhoneCall, Sparkles, TrendingUp } from "lucide-react";
 
 export default async function DashboardPage() {
-  const supabase = createAdminClient();
-
-  const { data } = await supabase
-    .from("searches")
-    .select("*")
-    .order("created_at", { ascending: false })
-    .limit(10);
-
-  const searches: any[] = data || [];
+  let searches: any[] = [];
+  try {
+    const supabase = createAdminClient();
+    const { data } = await supabase
+      .from("searches")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(10);
+    searches = data || [];
+  } catch (err) {
+    console.error("[DASHBOARD LOAD ERROR]", err);
+  }
 
   // Calculate dynamic stats
   const totalLeadsCount = searches.reduce((acc, s) => acc + (s.results_count || 0), 0);
