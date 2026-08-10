@@ -1,0 +1,93 @@
+import { ApifyPlaceItem } from "./apify/mapper";
+
+export function generateDemoLeads(sector: string, city: string): ApifyPlaceItem[] {
+  const baseSector = sector || "Boulangerie";
+  const baseCity = city || "Douala";
+
+  return [
+    {
+      placeId: `demo_1_${baseCity}`,
+      url: `https://www.google.com/maps/place/demo1`,
+      title: `${baseSector} La Reference - ${baseCity}`,
+      categoryName: baseSector,
+      address: `Avenue Akwa, Face Pharmacie de l'Indépendance, ${baseCity}`,
+      city: baseCity,
+      phone: "+237 6 99 12 34 56",
+      website: `https://${baseSector.toLowerCase().replace(/\s+/g, "")}-reference.cm`,
+      emails: [`contact@${baseSector.toLowerCase().replace(/\s+/g, "")}-reference.cm`],
+      totalScore: 4.8,
+      reviewsCount: 142,
+      location: { lat: 4.0511, lng: 9.7085 },
+    },
+    {
+      placeId: `demo_2_${baseCity}`,
+      url: `https://www.google.com/maps/place/demo2`,
+      title: `Ets ${baseSector} Excellence ${baseCity}`,
+      categoryName: baseSector,
+      address: `Boulevard de la Liberté, ${baseCity}`,
+      city: baseCity,
+      phone: "+237 6 77 88 99 00",
+      website: null, // Strong sales signal: NO WEBSITE
+      emails: [],
+      totalScore: 4.5,
+      reviewsCount: 89,
+      location: { lat: 4.048, lng: 9.702 },
+    },
+    {
+      placeId: `demo_3_${baseCity}`,
+      url: `https://www.google.com/maps/place/demo3`,
+      title: `Groupement ${baseSector} Afrique Sarl`,
+      categoryName: baseSector,
+      address: `Carrefour Bonakouamou, ${baseCity}`,
+      city: baseCity,
+      phone: "+237 6 55 44 33 22",
+      website: `https://groupement-${baseCity.toLowerCase()}.com`,
+      emails: [`sales@groupement-${baseCity.toLowerCase()}.com`],
+      totalScore: 4.2,
+      reviewsCount: 34,
+      location: { lat: 4.06, lng: 9.72 },
+    },
+    {
+      placeId: `demo_4_${baseCity}`,
+      url: `https://www.google.com/maps/place/demo4`,
+      title: `Le Grand Comptoir ${baseSector}`,
+      categoryName: baseSector,
+      address: `Rue Joffre, Deïdo, ${baseCity}`,
+      city: baseCity,
+      phone: "+237 6 91 00 22 33",
+      website: null, // Strong sales signal: NO WEBSITE
+      emails: [],
+      totalScore: 3.9,
+      reviewsCount: 18,
+      location: { lat: 4.072, lng: 9.715 },
+    },
+    {
+      placeId: `demo_5_${baseCity}`,
+      url: `https://www.google.com/maps/place/demo5`,
+      title: `Atelier & Services ${baseSector}`,
+      categoryName: baseSector,
+      address: `Ndokoti, ${baseCity}`,
+      city: baseCity,
+      phone: "+237 6 94 88 77 66",
+      website: `https://${baseSector.toLowerCase()}-atelier.cm`,
+      emails: [`info@${baseSector.toLowerCase()}-atelier.cm`],
+      totalScore: 4.9,
+      reviewsCount: 230,
+      location: { lat: 4.042, lng: 9.741 },
+    },
+    {
+      placeId: `demo_6_${baseCity}`,
+      url: `https://www.google.com/maps/place/demo6`,
+      title: `Société Nouvelle ${baseSector} ${baseCity}`,
+      categoryName: baseSector,
+      address: `Bonanjo, Rue de l'Hôpital, ${baseCity}`,
+      city: baseCity,
+      phone: "+237 6 70 11 22 33",
+      website: null,
+      emails: [],
+      totalScore: 4.1,
+      reviewsCount: 52,
+      location: { lat: 4.035, lng: 9.695 },
+    },
+  ];
+}

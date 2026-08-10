@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(unzip -l \"izisaas mobile money skills.zip\")",
+      "Bash(unzip -o -q \"c:/Users/jorda/Desktop/SAAS/PixiLead/izisaas mobile money skills.zip\" -d skills)",
+      "PowerShell(npm run typecheck)",
+      "PowerShell(npm test)",
+      "PowerShell(npm run build 2>&1)"
+    ]
+  }
+}
