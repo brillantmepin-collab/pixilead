@@ -207,7 +207,7 @@ export default function CreditsPage() {
             </div>
 
             {/* Packs */}
-            <div className="space-y-4">
+            <div id="packs" className="space-y-4 scroll-mt-24">
               <h2 className="text-xl font-extrabold text-white flex items-center gap-2">
                 <Sparkles className="w-5 h-5 text-emerald-400" />
                 Recharger mon compte

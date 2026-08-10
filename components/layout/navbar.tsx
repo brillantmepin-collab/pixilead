@@ -149,7 +149,7 @@ export function Navbar() {
               </Link>
 
               <Link
-                href="/app/credits"
+                href="/app/credits#packs"
                 className="btn-magnetic hidden sm:flex bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-md flex items-center gap-1.5"
               >
                 <Plus className="w-3.5 h-3.5" />

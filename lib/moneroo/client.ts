@@ -138,7 +138,31 @@ export async function initiatePayment(
     return { ok: false, error: `Moneroo a répondu ${res.status} (non-JSON)` };
   }
 
-  // Un 200 OK amputé de l'id ou de l'URL de checkout reste un échec.
+  // Si la devise XAF/XOF n'est pas encore activée dans le dashboard Moneroo Sandbox,
+  // on relance automatiquement l'initialisation en USD de secours.
+  if (
+    !res.ok &&
+    parsed.message?.includes("No payment methods enabled for this currency") &&
+    params.currency !== "USD"
+  ) {
+    console.log(`[MONEROO] Devise ${params.currency} non activée dans le compte marchand sandbox. Bascule automatique vers USD.`);
+    
+    // Conversion USD cents
+    let usdAmount = 900; // Starter ($9)
+    if (params.amount >= 35000) usdAmount = 6700; // Business ($67)
+    else if (params.amount >= 10000) usdAmount = 2500; // Pro ($25)
+
+    return initiatePayment(
+      {
+        ...params,
+        amount: usdAmount,
+        currency: "USD",
+      },
+      secretKey
+    );
+  }
+
+  // Un 200/201 OK amputé de l'id ou de l'URL de checkout reste un échec.
   if (!res.ok || !parsed.data?.id || !parsed.data?.checkout_url) {
     return {
       ok: false,
