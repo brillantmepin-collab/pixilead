@@ -3,11 +3,17 @@ import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 const DEFAULT_SUPABASE_URL = "https://secmudttvmejotfqtfof.supabase.co";
 const DEFAULT_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNlY211ZHR0dm1lam90ZnF0Zm9mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyNTQ5NjksImV4cCI6MjEwMTgzMDk2OX0.HJo9hvKcMG3E01swNhTmBA3cJaFX_V0JgeanHHcjfMk";
 
+function cleanEnvKey(val: string | undefined, fallback: string): string {
+  if (!val) return fallback;
+  const cleaned = val.replace(/^["']|["']$/g, "").trim();
+  return cleaned.length > 20 && !cleaned.includes("placeholder") ? cleaned : fallback;
+}
+
 let clientInstance: ReturnType<typeof createSupabaseClient> | null = null;
 
 export function createClient() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || DEFAULT_SUPABASE_URL;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || DEFAULT_SUPABASE_ANON_KEY;
+  const supabaseUrl = cleanEnvKey(process.env.NEXT_PUBLIC_SUPABASE_URL, DEFAULT_SUPABASE_URL);
+  const supabaseAnonKey = cleanEnvKey(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY, DEFAULT_SUPABASE_ANON_KEY);
 
   if (typeof window !== "undefined") {
     try {
